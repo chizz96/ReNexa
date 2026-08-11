@@ -1,8 +1,6 @@
 import { EntitySchema } from "typeorm";
 import { UserRole } from "../../types/user.js";
 
-
-
 export const User = new EntitySchema({
   name: "User",
   tableName: "users",
@@ -65,24 +63,23 @@ export const User = new EntitySchema({
       enum: Object.values(UserRole),
     },
 
-
     businessName: {
       type: "varchar",
+      length: 150,
       nullable: true,
     },
 
     businessType: {
       type: "varchar",
+      length: 100,
       nullable: true,
     },
 
     googleId: {
       type: "varchar",
       unique: true,
-      sparse: true,
       nullable: true,
     },
-
 
     isVerified: {
       type: "boolean",
@@ -113,7 +110,7 @@ export const User = new EntitySchema({
       type: "timestamptz",
       nullable: true,
     },
-    
+
     createdAt: {
       type: "timestamptz",
       createDate: true,
@@ -129,5 +126,19 @@ export const User = new EntitySchema({
       deleteDate: true,
       nullable: true,
     },
-  }
+  },
+
+  relations: {
+    bookingsAsRequester: {
+      type: "one-to-many",
+      target: "Booking",
+      inverseSide: "requester",
+    },
+
+    bookingsAsPicker: {
+      type: "one-to-many",
+      target: "Booking",
+      inverseSide: "picker",
+    },
+  },
 });

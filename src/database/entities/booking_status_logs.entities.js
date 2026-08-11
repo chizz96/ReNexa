@@ -31,6 +31,7 @@ export const BookingStatusLog = new EntitySchema({
         name: "booking_id",
         referencedColumnName: "booking_id",
       },
+      onDelete: "CASCADE",
     },
   },
 });

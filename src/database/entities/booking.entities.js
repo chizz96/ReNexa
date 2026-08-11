@@ -33,11 +33,11 @@ export const Booking = new EntitySchema({
     },
 
     time_window_start: {
-      type: "timestamp",
+      type: "timestamptz",
     },
 
     time_window_end: {
-      type: "timestamp",
+      type: "timestamptz",
     },
 
     status: {
@@ -53,6 +53,35 @@ export const Booking = new EntitySchema({
       nullable: true,
     },
 
+    actual_weight_or_bags: {
+      type: "numeric",
+      precision: 10,
+      scale: 2,
+      nullable: true,
+    },
+
+    completion_status: {
+      type: "enum",
+      enum: Object.values(CompletionStatus),
+      nullable: true,
+    },
+
+    completed_at: {
+      type: "timestamptz",
+      nullable: true,
+    },
+
+    confirmation_status: {
+      type: "enum",
+      enum: Object.values(ConfirmationStatus),
+      default: ConfirmationStatus.PENDING,
+    },
+
+    confirmation_timestamp: {
+      type: "timestamptz",
+      nullable: true,
+    },
+
     created_at: {
       type: "timestamptz",
       createDate: true,
@@ -62,38 +91,7 @@ export const Booking = new EntitySchema({
       type: "timestamptz",
       updateDate: true,
     },
-
-    actual_weight_or_bags: {
-    type: "numeric",
-    precision: 10,
-    scale: 2,
-    nullable: true,
   },
-
-  completion_status: {
-    type: "enum",
-    enum: Object.values(CompletionStatus),
-    nullable: true,
-  },
-
-  completed_at: {
-    type: "timestamptz",
-    nullable: true,
-  },
-
-  confirmation_status: {
-    type: "enum",
-    enum: Object.values(ConfirmationStatus),
-    default: ConfirmationStatus.PENDING,
-  },
-
-  confirmation_timestamp: {
-    type: "timestamptz",
-    nullable: true,
-  },
-    },
-
-  
 
   relations: {
     requester: {
@@ -103,6 +101,7 @@ export const Booking = new EntitySchema({
         name: "requester_id",
         referencedColumnName: "id",
       },
+      onDelete: "RESTRICT",
     },
 
     picker: {
@@ -113,6 +112,13 @@ export const Booking = new EntitySchema({
         referencedColumnName: "id",
       },
       nullable: true,
+      onDelete: "SET NULL",
+    },
+
+    statusLogs: {
+      type: "one-to-many",
+      target: "BookingStatusLog",
+      inverseSide: "booking",
     },
   },
 });

@@ -10,7 +10,7 @@ const router = Router();
 
 router.use(authverification);
 
-router.post( "/bookings", validate(createBookingSchema), bookingController.createBooking);
+router.post( "/bookings", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER), validate(createBookingSchema), bookingController.createBooking);
 router.patch("/:bookingId/claim", authorize(UserRole.WASTE_COLLECTOR), bookingController.claimBooking);
 router.patch( "/:bookingId/complete", authorize(UserRole.WASTE_COLLECTOR), validate(completeBookingSchema), bookingController.completeBooking);
 
