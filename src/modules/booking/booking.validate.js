@@ -1,9 +1,14 @@
 import Joi from "joi";
+import { ConfirmationStatus } from "../../types/bookingstatus.js";
 
 export const createBookingSchema = Joi.object({
   waste_type: Joi.string()
     .trim()
     .max(50)
+    .optional(),
+
+  quantity: Joi.number()
+    .positive()
     .optional(),
 
   lga: Joi.string()
@@ -29,5 +34,17 @@ export const createBookingSchema = Joi.object({
     .messages({
       "date.greater":
         "End time must be after start time",
+    }),
+});
+
+export const confirmBookingSchema = Joi.object({
+  confirmationStatus: Joi.string()
+    .valid( 
+      ConfirmationStatus.HOUSEHOLD_CONFIRMED,
+      ConfirmationStatus.DISPUTED)
+    .required()
+    .messages({
+      "any.only": "Invalid confirmation status",
+      "any.required": "Confirmation status is required",
     }),
 });

@@ -8,12 +8,7 @@ export const createBooking = asyncHandler(async (req, res) => {
     req.body
   );
 
-  return sendSuccess(
-    res,
-    201,
-    "Booking created successfully",
-    booking
-  );
+  return sendSuccess( res, 201, "Booking created successfully", booking);
 });
 
 export const claimBooking = asyncHandler(async (req, res) => {
@@ -33,6 +28,19 @@ export const completeBooking = asyncHandler(async (req, res) => {
   );
 
   return sendSuccess( res, 200, "Booking completed successfully", booking);
+});
+
+export const confirmBooking = asyncHandler(async (req, res) => {
+  const { bookingId } = req.params;
+  const { confirmationStatus } = req.body;
+
+  const booking = await bookingService.confirmBooking(
+    bookingId,
+    req.user.id,
+    confirmationStatus
+  );
+
+  return sendSuccess( res, 200, "Booking confirmation recorded", { booking });
 });
 
 

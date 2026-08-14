@@ -1,5 +1,5 @@
 import { Event } from "../../database/entities/eventlog.entities.js";
-
+import { AppDataSource } from "../../config/db.js"
 
 const eventRepo = AppDataSource.getRepository(Event);
 
@@ -39,6 +39,25 @@ export const logPickupCompleted = async ({ bookingId, pickerId, actualWeightOrBa
       timestamp: new Date(),
       bookingId,
       payload: { pickerId, actualWeightOrBags, completionStatus },
+    }),
+  );
+
+  return event;
+};
+
+export const logPickupConfirmed = async ({
+  bookingId,
+  confirmationStatus,
+}) => {
+  const event = await eventRepo.save(
+    eventRepo.create({
+      id: newId(),
+      eventType: "pickup_confirmation",
+      timestamp: new Date(),
+      bookingId,
+      payload: {
+        confirmationStatus,
+      },
     }),
   );
 

@@ -19,6 +19,13 @@ export const Booking = new EntitySchema({
       nullable: true,
     },
 
+    quantity: {
+      type: "numeric",
+      precision: 10,
+      scale: 2,
+      nullable: true,
+    },
+
     lga: {
       type: "varchar",
       length: 50,
