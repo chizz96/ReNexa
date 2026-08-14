@@ -11,7 +11,6 @@ import { generateResetToken } from "../../utils/resetPassword.js";
 import { exchangeCodeForGoogleProfile} from "../Googleoauthservices/google.provider.js";
 
 
-
 const userRepo = AppDataSource.getRepository("User")
 
 const generateOtp = () =>
@@ -20,12 +19,21 @@ const generateOtp = () =>
 
 const SALT_ROUNDS = 10;
 
-export function issueTokens(user) {
+
+const hashToken = (token) =>
+  crypto.createHash("sha256").update(token).digest("hex");
+
+export async function issueTokens(user) {
   const payload = { sub: user.id, role: user.role, email: user.email };
   const accessToken = jwt.sign(payload,  process.env.JWT_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN });
-  const refreshToken = jwt.sign({ sub: user.id, type: 'refresh' },  process.env.JWT_SECRET, {
+
+  const jti = newId(); 
+  const refreshToken = jwt.sign({ sub: user.id, type: 'refresh', jti },  process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
   });
+
+  await userRepo.update({ id: user.id }, { currentRefreshTokenHash: hashToken(refreshToken) });
+
   return { accessToken, refreshToken };
 }
 
@@ -64,7 +72,7 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
     otp,
   });
 
-  const tokens = issueTokens(user);
+  const tokens = await issueTokens(user);
   return { user: sanitizeUser(user), ...tokens };
 };
 
@@ -124,14 +132,52 @@ export const login = async ({ email, password }) => {
     throw new AppError("Invalid email or password", 400, "INVALID_CREDENTIALS");
   }
 
-  const tokens = issueTokens(user);
+  const tokens = await issueTokens(user);
 
   return {user: sanitizeUser(user),...tokens,};
 };
 
 
+// function for refreshing access token
+export const refreshAccessToken = async ({ refreshToken }) => {
+  let payload;
+
+  try {
+    payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+  } catch (err) {
+    throw new AppError("Invalid or expired refresh token", 401, "INVALID_REFRESH_TOKEN");
+  }
+
+  if (payload.type !== "refresh") {
+    throw new AppError("Invalid token type", 401, "INVALID_REFRESH_TOKEN");
+  }
+
+  const user = await userRepo.findOne({ where: { id: payload.sub } });
+
+  if (!user) {
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
+  }
+
+  const incomingHash = hashToken(refreshToken);
+
+  if (!user.currentRefreshTokenHash || incomingHash !== user.currentRefreshTokenHash) {
+    
+    await userRepo.update({ id: user.id }, { currentRefreshTokenHash: null });
+    throw new AppError("Refresh token reuse detected — please log in again", 401, "REFRESH_TOKEN_REUSE");
+  }
+
+  const tokens = await issueTokens(user); // mints + persists a new hash, invalidating this one
+
+  return { user: sanitizeUser(user), ...tokens };
+};
+
+
 // function for logout
-export const logout = async () => {
+export const logout = async ({ userId } = {}) => {
+  if (userId) {
+    await userRepo.update({ id: userId }, { currentRefreshTokenHash: null });
+  }
+
   return {
     message: "Logged out successfully",
   };
@@ -211,7 +257,7 @@ export const resetPassword = async ({ token, password, confirmPassword }) => {
 
 
 export const sanitizeUser = (user) => {
-  const { password, otp, verificationToken, ...safeUser } = user;
+  const { password, otp, verificationToken, currentRefreshTokenHash, ...safeUser } = user;
   return safeUser;
 };
 
@@ -271,7 +317,7 @@ export const authenticateGoogleProfile = async (profile) => {
     }
   }
 
-  const tokens = issueTokens(user);
+  const tokens = await issueTokens(user);
 
   return {
     user: sanitizeUser(user),

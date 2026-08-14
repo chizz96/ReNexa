@@ -34,13 +34,29 @@ export const resetPassword = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, "Password reset successfully", result);
 });
 
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const result = await authService.refreshAccessToken(req.body);
 
-export const logout = asyncHandler(async (req, res) => {
-  await authService.logout();
-  return sendSuccess(res, 200, "Logged out successfully", null);
+  return sendSuccess(
+    res,
+    200,
+    "Access token refreshed successfully",
+    result
+  );
 });
 
+export const logout = asyncHandler(async (req, res) => {
+  await authService.logout({
+    userId: req.user.sub,
+  });
 
+  return sendSuccess(
+    res,
+    200,
+    "Logged out successfully",
+    null
+  );
+});
 
 // Google OAuth controller functions
 export const googleLogin = asyncHandler(async (req, res) => {

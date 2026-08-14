@@ -1,10 +1,12 @@
 import express from "express";
 import { Router } from "express";
 import * as authController from "../auth/auth.controller.js";
+import { authverification, authorize } from '../../middleware/auth.middleware.js';
 import { validate } from "../../middleware/validate.middleware.js";
-import { registerSchema, verifyEmailSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from "../auth/auth.validate.js";
+import { registerSchema, verifyEmailSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, refreshTokenSchema } from "../auth/auth.validate.js";
 
 const router = Router();
+router.use( authverification );
 
 
 router.post("/register", validate(registerSchema), authController.register); 
@@ -17,7 +19,9 @@ router.post("/forgot-password",validate(forgotPasswordSchema),authController.for
 
 router.post("/reset-password/:token",validate(resetPasswordSchema),authController.resetPassword);
 
+router.post("/refresh-token",validate(refreshTokenSchema), authController.refreshAccessToken);
 
+router.post("/logout", authverification, authController.logout);
 
 router.get("/google", authController.googleLogin);
 

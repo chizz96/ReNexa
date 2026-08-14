@@ -33,6 +33,12 @@ export const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+export const refreshTokenSchema = Joi.object({
+  refreshToken: Joi.string().required().messages({
+    "string.empty": "Refresh token is required",
+    "any.required": "Refresh token is required",
+  }),
+});
 
 export const forgotPasswordSchema = Joi.object({
   email: Joi.string()

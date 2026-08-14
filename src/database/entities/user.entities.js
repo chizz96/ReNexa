@@ -101,6 +101,11 @@ export const User = new EntitySchema({
       nullable: true,
     },
 
+    currentRefreshTokenHash: {
+      type: "varchar",
+      nullable: true,
+    },        
+
     otp: {
       type: "varchar",
       nullable: true,
