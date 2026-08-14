@@ -17,6 +17,8 @@ router.post("/forgot-password",validate(forgotPasswordSchema),authController.for
 
 router.post("/reset-password/:token",validate(resetPasswordSchema),authController.resetPassword);
 
+
+
 router.get("/google", authController.googleLogin);
 
 router.get("/google/callback", authController.googleCallback);

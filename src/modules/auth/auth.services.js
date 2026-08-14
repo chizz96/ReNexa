@@ -30,7 +30,6 @@ export function issueTokens(user) {
 }
 
 
-
 export const register = async ({ firstName, lastName, email, password, phoneNumber, role }) => {
   const existingUser = await userRepo.findOne({ where: { email } });
 
@@ -156,7 +155,7 @@ export const forgotPassword = async ({ email }) => {
 
   await userRepo.save(user);
 
-  const resetUrl = `http://localhost:5000/api/auth/reset-password/${resetToken}`;
+  const resetUrl = `https://renexa.onrender.com/api/auth/reset-password/${resetToken}`;
 
   sendTemplateEmail(user.email, "Reset Password", "forgetPassword",{
     firstName:user.firstName,
