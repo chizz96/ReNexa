@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "migration:generate": "npx typeorm migration:generate -d src/config/db.js",
+    "migration:run": "npx typeorm migration:run -d src/config/db.js",
+    "migration:revert": "npx typeorm migration:revert -d src/config/db.js",
+    "migration:create": "npx typeorm migration:create -d src/config/db.js",
+    "migration:show": "npx typeorm migration:show -d src/config/db.js"
   },
   "keywords": [],
   "author": "",

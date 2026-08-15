@@ -5,9 +5,5 @@ export const UserRole = Object.freeze({
   ADMIN: "admin",
 });
 
-export const UserStatus = Object.freeze({
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-  SUSPENDED: "suspended",
-});
+
 

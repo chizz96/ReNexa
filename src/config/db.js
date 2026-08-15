@@ -19,11 +19,11 @@ export const AppDataSource = new DataSource({
     rejectUnauthorized: false,
   },
 
-  synchronize: true,
+  synchronize: false,
   logging: false,
   entities: [ User, Booking, BookingStatusLog ],
   migrations: [
-    "src/migration/**/*.ts"
+    "src/database/migrations/*.js"
   ],
   
 });
