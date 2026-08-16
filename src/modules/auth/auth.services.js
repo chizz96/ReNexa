@@ -9,6 +9,7 @@ import { AuthProvider } from "../../types/authprovider.js";
 import { sendTemplateEmail } from "../../utils/email.utils.js";
 import { generateResetToken } from "../../utils/resetPassword.js";
 import { exchangeCodeForGoogleProfile} from "../Googleoauthservices/google.provider.js";
+import  logger  from "../../utils/logger.js";
 
 
 const userRepo = AppDataSource.getRepository("User")
@@ -38,7 +39,7 @@ export async function issueTokens(user) {
 }
 
 
-export const register = async ({ firstName, lastName, email, password, phoneNumber, role }) => {
+export const register = async ({ firstName, lastName, email, password, phoneNumber, lga, city, addressText, role }) => {
   const existingUser = await userRepo.findOne({ where: { email } });
 
   if (existingUser) {
@@ -54,6 +55,9 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
       id : newId(),
       email,
       phoneNumber,
+      lga,
+      city,
+      addressText,
       password: hashedPassword,
       otp,
       otpExpiry,
@@ -63,8 +67,8 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
       authProvider: AuthProvider.LOCAL,
     }),
   );
-  
 
+  logger.info("Account created", { userId: user.id, zone:user.lga, role: user.role });
 
   sendTemplateEmail(email, "Email Verification", "register", {
     firstName,
@@ -74,6 +78,8 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
 
   const tokens = await issueTokens(user);
   return { user: sanitizeUser(user), ...tokens };
+
+
 };
 
 
