@@ -39,11 +39,15 @@ export async function issueTokens(user) {
 }
 
 // function for user registration
-export const register = async ({ firstName, lastName, email, password, phoneNumber, lga, city, residentialAddress, role }) => {
+export const register = async ({ firstName, lastName, email, password, confirmPassword, phoneNumber, lga, city, residentialAddress, role }) => {
   const existingUser = await userRepo.findOne({ where: { email } });
 
   if (existingUser) {
     throw new AppError("User already exists", 409, "DUPLICATE_USER");
+  }
+
+  if (password !== confirmPassword) {
+    throw new AppError("Passwords do not match", 400, "PASSWORD_MISMATCH");
   }
 
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);

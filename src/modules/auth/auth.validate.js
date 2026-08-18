@@ -26,6 +26,15 @@ export const registerSchema = Joi.object({
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       "any.required": "Password is required",
     }),
+
+  confirmPassword: Joi.any()
+    .valid(Joi.ref("password"))
+    .required()
+    .messages({
+      "any.only": "Passwords do not match",
+      "any.required": "Confirm password is required",
+    }),
+    
   role: Joi.string().valid(...Object.values(UserRole)).default(UserRole.HOUSEHOLD),
 });
 
