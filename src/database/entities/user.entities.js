@@ -53,7 +53,7 @@ export const User = new EntitySchema({
       nullable: true,
     },
 
-    addressText: {
+    residentialAddress: {
       type: "text",
       nullable: true,
     },
@@ -72,6 +72,22 @@ export const User = new EntitySchema({
     businessType: {
       type: "varchar",
       length: 100,
+      nullable: true,
+    },
+
+    businesscity: {
+      type: "varchar",
+      length: 100,
+      nullable: true,
+    },
+    businessLga: {
+      type: "varchar",
+      length: 100,
+      nullable: true,
+    },
+
+    businessAddress: {
+      type: "text",
       nullable: true,
     },
 

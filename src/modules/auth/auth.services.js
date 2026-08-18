@@ -38,8 +38,8 @@ export async function issueTokens(user) {
   return { accessToken, refreshToken };
 }
 
-
-export const register = async ({ firstName, lastName, email, password, phoneNumber, lga, city, addressText, role }) => {
+// function for user registration
+export const register = async ({ firstName, lastName, email, password, phoneNumber, lga, city, residentialAddress, role }) => {
   const existingUser = await userRepo.findOne({ where: { email } });
 
   if (existingUser) {
@@ -57,7 +57,7 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
       phoneNumber,
       lga,
       city,
-      addressText,
+      residentialAddress,
       password: hashedPassword,
       otp,
       otpExpiry,
@@ -77,7 +77,7 @@ export const register = async ({ firstName, lastName, email, password, phoneNumb
   });
 
   const tokens = await issueTokens(user);
-  return { user: sanitizeUser(user), ...tokens };
+  return { user: sanitizeUser(user) };
 
 
 };
@@ -106,6 +106,10 @@ export const verifyEmail = async ({ otp }) => {
   return {
     message: "Email verified successfully",
   };
+
+
+  const tokens = await issueTokens(user);
+  return { user: sanitizeUser(user), ...tokens };
 };
 
 
@@ -140,8 +144,51 @@ export const login = async ({ email, password }) => {
 
   const tokens = await issueTokens(user);
 
-  return {user: sanitizeUser(user),...tokens,};
+  return {user: sanitizeUser(user), ...tokens};
 };
+
+// function for resending OTP
+export const resendOtp = async ({ email }) => {
+
+  const user = await userRepo.findOne({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404, "NOT_FOUND");
+  }
+
+  const otp = generateOtp();
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+  await userRepo.update(
+    { id: user.id },
+    {
+      otp,
+      otpExpiry,
+    }
+  );
+
+  await sendTemplateEmail(
+    user.email,
+    "Your New Verification Code",
+    "resend-otp",
+    {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      otp,
+    }
+  );
+
+  return {
+    message: "OTP resent successfully",
+  };
+
+  const tokens = await issueTokens(user);
+
+  return {user: sanitizeUser(user), ...tokens};
+};
+
 
 
 // function for refreshing access token
@@ -174,7 +221,7 @@ export const refreshAccessToken = async ({ refreshToken }) => {
 
   const tokens = await issueTokens(user); // mints + persists a new hash, invalidating this one
 
-  return { user: sanitizeUser(user), ...tokens };
+  return { user: sanitizeUser(user)};
 };
 
 
@@ -279,7 +326,7 @@ export const authenticateGoogleProfile = async (profile) => {
 
   // Google account doesn't exist yet
   if (!user) {
-    // Check whether the email already belongs to a WastePal account
+    // Check whether the email already belongs to a Renexa account
     user = await userRepo.findOne({
       where: {
         email: profile.email,

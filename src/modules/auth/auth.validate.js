@@ -9,6 +9,12 @@ export const registerSchema = Joi.object({
       "string.email": "Please provide a valid email address",
       "any.required": "Email is required",
     }),
+
+  lga: Joi.string().trim().max(100).optional(),
+
+  city: Joi.string().trim().max(100).optional(),
+
+  residentialAddress : Joi.string().trim().max(2000).optional(),
     
   phoneNumber: Joi.string().pattern(/^(?:\+234|234|0)[789][01]\d{8}$/).required(),
   password: Joi.string().min(8).max(50).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required()
@@ -27,6 +33,12 @@ export const verifyEmailSchema = Joi.object({
   otp: Joi.string().length(6).required(),
 });
 
+
+export const resendOtpSchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().required().messages({
+    "string.empty": "Email is required",
+  }),
+});
 
 export const loginSchema = Joi.object({
   email: Joi.string().email().required(),

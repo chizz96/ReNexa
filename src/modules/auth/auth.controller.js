@@ -21,6 +21,10 @@ export const login = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, "User login successfully", result);
 });
 
+export const resendotp = asyncHandler(async (req, res) => {
+  const result = await authService.resendotp(req.body);
+  return sendSuccess(res, 200, "OTP resent successfully", result);
+});
 
 // Forgot password controller function
 export const forgotPassword = asyncHandler(async (req, res) => {
