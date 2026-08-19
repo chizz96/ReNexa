@@ -39,7 +39,7 @@ export async function issueTokens(user) {
 }
 
 // function for user registration
-export const register = async ({ firstName, lastName, email, password, confirmPassword, phoneNumber, lga, city, residentialAddress, role }) => {
+export const register = async ({ firstName, lastName, email, password, confirmPassword, phoneNumber }) => {
   const existingUser = await userRepo.findOne({ where: { email } });
 
   if (existingUser) {
@@ -59,20 +59,15 @@ export const register = async ({ firstName, lastName, email, password, confirmPa
       id : newId(),
       email,
       phoneNumber,
-      lga,
-      city,
-      residentialAddress,
       password: hashedPassword,
       otp,
       otpExpiry,
       firstName,
       lastName,
-      role,
       authProvider: AuthProvider.LOCAL,
     }),
   );
 
-  logger.info("Account created", { userId: user.id, zone:user.lga, role: user.role });
 
   sendTemplateEmail(email, "Email Verification", "register", {
     firstName,

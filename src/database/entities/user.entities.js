@@ -63,6 +63,12 @@ export const User = new EntitySchema({
       enum: Object.values(UserRole),
     },
 
+
+    onboardingStep: {
+      type: "enum",
+      enum: ["BASIC_INFO", "ACCOUNT_TYPE", "PROFILE_COMPLETE"],
+      default: "BASIC_INFO",
+    },
     businessName: {
       type: "varchar",
       length: 150,

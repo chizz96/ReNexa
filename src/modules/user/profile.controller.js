@@ -13,3 +13,14 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, 200, "Profile updated successfully",profile);
 });
+
+
+export const setAccountType = asyncHandler(async (req, res) => {
+  const profile = await profileService.setAccountType(req.user.sub, req.body);
+  return sendSuccess(res, 200, "Account type updated successfully", profile);
+});
+
+export const completeProfile = asyncHandler(async (req, res) => {
+  const profile = await profileService.completeProfile(req.user.sub, req.body);
+  return sendSuccess(res, 200, "Profile completed successfully", profile);
+});

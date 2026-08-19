@@ -13,4 +13,8 @@ router.get("/all-profile", authverification, profileController.getProfile);
 // Update Authenticated User Profile
 router.patch("/update-user-profile", authverification, validate(updateProfileSchema), profileController.updateProfile);
 
+
+router.patch("/account-type", authverification, profileController.setAccountType);   // phase 2a
+router.patch("/profile", authverification, profileController.completeProfile);       // phase 2b
+
 export default router;
