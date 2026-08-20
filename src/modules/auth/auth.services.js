@@ -105,9 +105,6 @@ export const verifyEmail = async ({ otp }) => {
   const tokens = await issueTokens(user);
   return { user: sanitizeUser(user), ...tokens };
 
-  return {
-    message: "Email verified successfully",
-  };
 
 };
 
