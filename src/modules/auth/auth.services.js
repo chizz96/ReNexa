@@ -75,7 +75,10 @@ export const register = async ({ firstName, lastName, email, password, confirmPa
     otp,
   });
 
-  return{user}
+  return {
+    user: sanitizeUser(user),
+    message: "Registration successful, please verify your email",
+  };
 
 
 };
@@ -104,7 +107,6 @@ export const verifyEmail = async ({ otp }) => {
 
   const tokens = await issueTokens(user);
   return { user: sanitizeUser(user), ...tokens };
-
 
 };
 
@@ -138,10 +140,9 @@ export const login = async ({ email, password }) => {
     throw new AppError("Invalid email or password", 400, "INVALID_CREDENTIALS");
   }
 
- return {
-    user: sanitizeUser(user),
-    message: "Registration successful, please verify your email",
-  };
+  const tokens = await issueTokens(user);
+
+  return { user: sanitizeUser(user), ...tokens };
 };
 
 // function for resending OTP
