@@ -19,19 +19,9 @@ export const Booking = new EntitySchema({
       nullable: true,
     },
 
-    lga: {
-      type: "varchar",
-      length: 50,
-    },
-
-    area: {
-      type: "varchar",
-      length: 100,
-    },
-
-    address_text: {
+    pickup_address: {
       type: "text",
-    },
+    },  
 
     time_window_start: {
       type: "timestamptz",
@@ -47,11 +37,10 @@ export const Booking = new EntitySchema({
       default: BookingStatus.BOOKED,
     },
 
-    price_agreed: {
+    quantity: {
       type: "numeric",
       precision: 10,
       scale: 2,
-      nullable: true,
     },
 
     actual_weight_or_bags: {

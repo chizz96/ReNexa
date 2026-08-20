@@ -49,10 +49,6 @@ export const updateProfileSchema = Joi.object({
   }).min(1);
 
 
-// user.validation.js
-import Joi from "joi";
-import { UserRole } from "../../types/user.js";
-
 // PATCH /users/account-type
 export const setAccountTypeSchema = Joi.object({
   role: Joi.string()

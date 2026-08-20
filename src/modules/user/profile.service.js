@@ -1,6 +1,7 @@
 import { AppDataSource } from "../../config/db.js";
 import { AppError } from "../../utils/AppError.js";
 import { User } from "../../database/entities/user.entities.js"
+import  logger  from "../../utils/logger.js";
 
 const userRepository = AppDataSource.getRepository("User");
 
@@ -175,7 +176,7 @@ export const completeProfile = async (userId, payload) => {
   user.onboardingStep = "PROFILE_COMPLETE";
   await userRepo.save(user);
 
-  logger.info("Account created", { userId: user.id, zone:user.lga, role: user.role });
+  logger.info("Account created", {userId: user.id, zone: user.role === UserRole.HOUSEHOLD ? user.lga : user.businessLga,role: user.role,});
 
   
   return { user: sanitizeUser(user) };

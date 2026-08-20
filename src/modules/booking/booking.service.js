@@ -12,10 +12,8 @@ export const createBooking = async (userId, payload) => {
     const booking = manager.getRepository(Booking).create({
       requester: { id: userId },
       waste_type: payload.waste_type,
+      pickup_address: payload.pickup_address,
       quantity: payload.quantity,
-      lga: payload.lga,
-      area: payload.area,
-      address_text: payload.address_text,
       time_window_start: payload.time_window_start,
       time_window_end: payload.time_window_end,
     });

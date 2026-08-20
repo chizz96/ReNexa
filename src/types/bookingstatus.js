@@ -1,6 +1,5 @@
 export const BookingStatus = Object.freeze({
   BOOKED: "booked",
-  CLAIMED: "claimed",
   PICKED_UP: "picked_up",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
