@@ -71,7 +71,7 @@ const householdProfileSchema = Joi.object({
 
 // PATCH /users/profile — business branch
 const businessProfileSchema = Joi.object({
-  role: Joi.string().valid(UserRole.BUSINESS).required(),
+  role: Joi.string().valid(UserRole.BUSINESS_OWNER).required(),
   businessName: Joi.string().max(150).required(),
   businessType: Joi.string().max(100).required(),
   businesscity: Joi.string().max(100).required(),
@@ -84,7 +84,7 @@ export const completeProfileSchema = Joi.alternatives()
   .conditional(Joi.object({ role: UserRole.HOUSEHOLD }).unknown(), {
     then: householdProfileSchema,
     otherwise: Joi.alternatives()
-      .conditional(Joi.object({ role: UserRole.BUSINESS }).unknown(), {
+      .conditional(Joi.object({ role: UserRole.BUSINESS_OWNER }).unknown(), {
         then: businessProfileSchema,
         otherwise: Joi.object({
           role: Joi.string()

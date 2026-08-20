@@ -165,7 +165,7 @@ export const completeProfile = async (userId, payload) => {
       throw new AppError("Missing household profile fields", 400, "VALIDATION_ERROR");
     }
     Object.assign(user, { lga, city, residentialAddress });
-  } else if (user.role === UserRole.BUSINESS) {
+  } else if (user.role === UserRole.BUSINESS_OWNER) {
     const { businessName, businessType, businesscity, businessLga, businessAddress } = payload;
     if (!businessName || !businessType || !businesscity || !businessLga || !businessAddress) {
       throw new AppError("Missing business profile fields", 400, "VALIDATION_ERROR");
