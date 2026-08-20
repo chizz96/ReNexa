@@ -14,7 +14,7 @@ router.post("/verify-email", validate(verifyEmailSchema), authController.verifyE
 
 router.post("/login", validate(loginSchema), authController.login);
 
-router.post("/resend-otp", validate(resendOtpSchema), authController.resendotp);
+router.post("/resend-otp", validate(resendOtpSchema), authController.resendOtp);
 
 router.post("/forgot-password",validate(forgotPasswordSchema),authController.forgotPassword);
 
