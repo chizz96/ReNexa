@@ -21,8 +21,8 @@ export const login = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, "User login successfully", result);
 });
 
-export const resendotp = asyncHandler(async (req, res) => {
-  const result = await authService.resendotp(req.body);
+export const resendOtp = asyncHandler(async (req, res) => {
+  const result = await authService.resendOtp(req.body);
   return sendSuccess(res, 200, "OTP resent successfully", result);
 });
 

@@ -56,7 +56,7 @@ export const getProfile = async (targetUserId) => {
     };
   }
 
-  if (user.role === UserRole.BUSINESS) {
+  if (user.role === UserRole.BUSINESS_OWNER) {
     return {
       ...userDetails,
       businessName: user.businessName,
@@ -121,7 +121,7 @@ export const UpdateProfile = async (targetUserId, payload) => {
     if (residentialAddress !== undefined) user.residentialAddress = residentialAddress;
   }
 
-  if (user.role === UserRole.BUSINESS) {
+  if (user.role === UserRole.BUSINESS_OWNER) {
     if (businessName !== undefined) user.businessName = businessName;
     if (businessType !== undefined) user.businessType = businessType;
     if (businesscity !== undefined) user.businesscity = businesscity;
@@ -143,7 +143,7 @@ export const UpdateProfile = async (targetUserId, payload) => {
       city: user.city,
       residentialAddress: user.residentialAddress,
     }),
-    ...(user.role === UserRole.BUSINESS && {
+    ...(user.role === UserRole.BUSINESS_OWNER && {
       businessName: user.businessName,
       businessType: user.businessType,
       businesscity: user.businesscity,

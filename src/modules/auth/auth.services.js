@@ -75,8 +75,7 @@ export const register = async ({ firstName, lastName, email, password, confirmPa
     otp,
   });
 
-  const tokens = await issueTokens(user);
-  return { user: sanitizeUser(user) };
+  return{user}
 
 
 };
@@ -102,13 +101,14 @@ export const verifyEmail = async ({ otp }) => {
     }
   );
 
+
+  const tokens = await issueTokens(user);
+  return { user: sanitizeUser(user), ...tokens };
+
   return {
     message: "Email verified successfully",
   };
 
-
-  const tokens = await issueTokens(user);
-  return { user: sanitizeUser(user), ...tokens };
 };
 
 
@@ -141,9 +141,10 @@ export const login = async ({ email, password }) => {
     throw new AppError("Invalid email or password", 400, "INVALID_CREDENTIALS");
   }
 
-  const tokens = await issueTokens(user);
-
-  return {user: sanitizeUser(user), ...tokens};
+ return {
+    user: sanitizeUser(user),
+    message: "Registration successful, please verify your email",
+  };
 };
 
 // function for resending OTP
@@ -183,9 +184,6 @@ export const resendOtp = async ({ email }) => {
     message: "OTP resent successfully",
   };
 
-  const tokens = await issueTokens(user);
-
-  return {user: sanitizeUser(user), ...tokens};
 };
 
 
@@ -220,7 +218,7 @@ export const refreshAccessToken = async ({ refreshToken }) => {
 
   const tokens = await issueTokens(user); // mints + persists a new hash, invalidating this one
 
-  return { user: sanitizeUser(user)};
+  return { user: sanitizeUser(user), ...tokens };
 };
 
 
