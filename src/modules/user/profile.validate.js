@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { UserRole } from "../../types/user.js";
 
 export const updateProfileSchema = Joi.object({
     firstName: Joi.string()
