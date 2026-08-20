@@ -6,52 +6,81 @@ import { UserRole } from "../../types/user.js";
 
 const userRepo = AppDataSource.getRepository("User");
 
-export const getProfile = async (userId) => {
-  const user = await userRepo.findOne({where: {
-      id: userId,
-    },
+import { UserRole } from "../../types/user.js";
+
+export const getProfile = async (targetUserId) => {
+  const user = await userRepo.findOne({
+    where: { id: targetUserId },
     select: {
       id: true,
       firstName: true,
       lastName: true,
       email: true,
       phoneNumber: true,
+      role: true,
+      // household fields
+      lga: true,
+      city: true,
+      residentialAddress: true,
+      // business fields
       businessName: true,
       businessType: true,
-      address: true,
-      city: true,
-      state: true,
-      country: true,
-      role: true,
+      businessLga: true,
+      businesscity: true,
+      businessAddress: true,
       createdAt: true,
       updatedAt: true,
     },
   });
 
   if (!user) {
-    throw new AppError(
-      "User not found",
-      404,
-      "USER_NOT_FOUND"
-    );
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
-  return user;
+  // Shape the response based on role, rather than dumping every column
+  const userDetails = {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+
+  if (user.role === UserRole.HOUSEHOLD) {
+    return {
+      ...userDetails,
+      lga: user.lga,
+      city: user.city,
+      residentialAddress: user.residentialAddress,
+    };
+  }
+
+  if (user.role === UserRole.BUSINESS) {
+    return {
+      ...userDetails,
+      businessName: user.businessName,
+      businessType: user.businessType,
+      businessLga: user.businessLga,
+      businesscity: user.businesscity,
+      businessAddress: user.businessAddress,
+    };
+  }
+
+  // fallback for any other role (e.g. admin, unset role)
+  return userDetails;
 };
 
-export const updateProfile = async (userId, payload) => {
+
+export const UpdateProfile = async (targetUserId, payload) => {
   const user = await userRepo.findOne({
-    where: {
-      id: userId,
-    },
+    where: { id: targetUserId },
   });
 
   if (!user) {
-    throw new AppError(
-      "User not found",
-      404,
-      "USER_NOT_FOUND"
-    );
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
   const {
@@ -62,14 +91,15 @@ export const updateProfile = async (userId, payload) => {
     businessType,
     lga,
     city,
-    addressText,
+    businesscity,
+    businessLga,
+    businessAddress,
+    residentialAddress,
   } = payload;
 
   if (phoneNumber && phoneNumber !== user.phoneNumber) {
     const existingPhone = await userRepo.findOne({
-      where: {
-        phoneNumber,
-      },
+      where: { phoneNumber },
     });
 
     if (existingPhone) {
@@ -81,40 +111,27 @@ export const updateProfile = async (userId, payload) => {
     }
   }
 
-  if (firstName !== undefined) {
-    user.firstName = firstName;
+  // Fields common to every role
+  if (firstName !== undefined) user.firstName = firstName;
+  if (lastName !== undefined) user.lastName = lastName;
+  if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+
+  // Only touch role-specific fields that match the user's actual role,
+  // so an admin can't accidentally write business fields onto a household user
+  if (user.role === UserRole.HOUSEHOLD) {
+    if (lga !== undefined) user.lga = lga;
+    if (city !== undefined) user.city = city;
+    if (residentialAddress !== undefined) user.residentialAddress = residentialAddress;
   }
 
-  if (lastName !== undefined) {
-    user.lastName = lastName;
+  if (user.role === UserRole.BUSINESS) {
+    if (businessName !== undefined) user.businessName = businessName;
+    if (businessType !== undefined) user.businessType = businessType;
+    if (businesscity !== undefined) user.businesscity = businesscity;
+    if (businessLga !== undefined) user.businessLga = businessLga;
+    if (businessAddress !== undefined) user.businessAddress = businessAddress;
   }
 
-  if (phoneNumber !== undefined) {
-    user.phoneNumber = phoneNumber;
-  }
-
-  if (businessName !== undefined) {
-    user.businessName = businessName;
-  }
-
-  if (businessType !== undefined) {
-    user.businessType = businessType;
-  }
-
-  if (lga !== undefined) {
-    user.lga = lga;
-  }
-
-
-  if (city !== undefined) {
-    user.city = city;
-  }
-
-  if (addressText !== undefined) {
-    user.addressText = addressText;
-  }
-
-  
   await userRepo.save(user);
 
   return {
@@ -123,12 +140,19 @@ export const updateProfile = async (userId, payload) => {
     lastName: user.lastName,
     email: user.email,
     phoneNumber: user.phoneNumber,
-    businessName: user.businessName,
-    businessType: user.businessType,
-    lga: user.lga,
-    city: user.city,
-    addressText: user.addressText,
     role: user.role,
+    ...(user.role === UserRole.HOUSEHOLD && {
+      lga: user.lga,
+      city: user.city,
+      residentialAddress: user.residentialAddress,
+    }),
+    ...(user.role === UserRole.BUSINESS && {
+      businessName: user.businessName,
+      businessType: user.businessType,
+      businesscity: user.businesscity,
+      businessLga: user.businessLga,
+      businessAddress: user.businessAddress,
+    }),
     updatedAt: user.updatedAt,
   };
 };
