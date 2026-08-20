@@ -2,6 +2,7 @@ import { AppDataSource } from "../../config/db.js";
 import { AppError } from "../../utils/AppError.js";
 import { User } from "../../database/entities/user.entities.js"
 import  logger  from "../../utils/logger.js";
+import { UserRole } from "../../types/user.js";
 
 const userRepository = AppDataSource.getRepository("User");
 
