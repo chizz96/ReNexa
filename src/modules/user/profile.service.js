@@ -6,8 +6,6 @@ import { UserRole } from "../../types/user.js";
 
 const userRepo = AppDataSource.getRepository("User");
 
-import { UserRole } from "../../types/user.js";
-
 export const getProfile = async (targetUserId) => {
   const user = await userRepo.findOne({
     where: { id: targetUserId },
@@ -37,7 +35,7 @@ export const getProfile = async (targetUserId) => {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
-  // Shape the response based on role, rather than dumping every column
+  
   const userDetails = {
     id: user.id,
     firstName: user.firstName,
@@ -69,7 +67,7 @@ export const getProfile = async (targetUserId) => {
     };
   }
 
-  // fallback for any other role (e.g. admin, unset role)
+
   return userDetails;
 };
 
@@ -111,13 +109,12 @@ export const UpdateProfile = async (targetUserId, payload) => {
     }
   }
 
-  // Fields common to every role
+  
   if (firstName !== undefined) user.firstName = firstName;
   if (lastName !== undefined) user.lastName = lastName;
   if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
 
-  // Only touch role-specific fields that match the user's actual role,
-  // so an admin can't accidentally write business fields onto a household user
+  
   if (user.role === UserRole.HOUSEHOLD) {
     if (lga !== undefined) user.lga = lga;
     if (city !== undefined) user.city = city;
