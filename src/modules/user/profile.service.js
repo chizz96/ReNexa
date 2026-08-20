@@ -4,10 +4,10 @@ import { User } from "../../database/entities/user.entities.js"
 import  logger  from "../../utils/logger.js";
 import { UserRole } from "../../types/user.js";
 
-const userRepository = AppDataSource.getRepository("User");
+const userRepo = AppDataSource.getRepository("User");
 
 export const getProfile = async (userId) => {
-  const user = await userRepository.findOne({where: {
+  const user = await userRepo.findOne({where: {
       id: userId,
     },
     select: {
@@ -40,7 +40,7 @@ export const getProfile = async (userId) => {
 };
 
 export const updateProfile = async (userId, payload) => {
-  const user = await userRepository.findOne({
+  const user = await userRepo.findOne({
     where: {
       id: userId,
     },
@@ -66,7 +66,7 @@ export const updateProfile = async (userId, payload) => {
   } = payload;
 
   if (phoneNumber && phoneNumber !== user.phoneNumber) {
-    const existingPhone = await userRepository.findOne({
+    const existingPhone = await userRepo.findOne({
       where: {
         phoneNumber,
       },
@@ -115,7 +115,7 @@ export const updateProfile = async (userId, payload) => {
   }
 
   
-  await userRepository.save(user);
+  await userRepo.save(user);
 
   return {
     id: user.id,
