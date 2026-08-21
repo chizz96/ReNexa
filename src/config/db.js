@@ -21,9 +21,7 @@ export const AppDataSource = new DataSource({
   synchronize: true,
   logging: false,
   entities: [ User, Booking, BookingStatusLog ],
-  migrations: [
-    "src/database/migrations/*.js"
-  ],
+
   
   
 });
