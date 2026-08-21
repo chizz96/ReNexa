@@ -73,7 +73,7 @@ export const getProfile = async (targetUserId) => {
 };
 
 
-export const UpdateProfile = async (targetUserId, payload) => {
+export const updateProfile = async (targetUserId, payload) => {
   const user = await userRepo.findOne({
     where: { id: targetUserId },
   });

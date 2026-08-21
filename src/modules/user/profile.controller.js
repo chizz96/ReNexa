@@ -11,7 +11,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
   const profile = await profileService.updateProfile(req.user.sub, req.body);
 
-  return sendSuccess(res, 200, "Profile updated successfully",profile);
+  return sendSuccess(res, 200, "Profile updated successfully", profile);
 });
 
 
