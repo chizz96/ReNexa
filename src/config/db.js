@@ -18,7 +18,7 @@ export const AppDataSource = new DataSource({
   ssl: {
     rejectUnauthorized: false,
   },
-  synchronize: false,
+  synchronize: true,
   logging: false,
   entities: [ User, Booking, BookingStatusLog ],
   migrations: [
