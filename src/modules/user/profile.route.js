@@ -5,6 +5,7 @@ import { authverification, authorize } from '../../middleware/auth.middleware.js
 import {updateProfileSchema,} from "./profile.validate.js";
 import { UserRole } from "../../types/user.js";
 
+
 const router = Router();
 router.use( authverification);
 

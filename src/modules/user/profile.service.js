@@ -3,6 +3,7 @@ import { AppError } from "../../utils/AppError.js";
 import { User } from "../../database/entities/user.entities.js"
 import  logger  from "../../utils/logger.js";
 import { UserRole } from "../../types/user.js";
+import { sanitizeUser } from "../auth/auth.services.js";
 
 const userRepo = AppDataSource.getRepository("User");
 
