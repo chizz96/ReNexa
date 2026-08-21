@@ -65,6 +65,7 @@ export const register = async ({ firstName, lastName, email, password, confirmPa
       firstName,
       lastName,
       authProvider: AuthProvider.LOCAL,
+      
     }),
   );
 

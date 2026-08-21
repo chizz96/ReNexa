@@ -61,6 +61,7 @@ export const User = new EntitySchema({
     role: {
       type: "enum",
       enum: Object.values(UserRole),
+      nullable: true,
     },
 
 
