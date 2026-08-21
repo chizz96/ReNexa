@@ -11,8 +11,8 @@ export const register = asyncHandler(async (req, res) => {
 
 // Email verification controller function
 export const verifyEmail = asyncHandler(async (req, res) => {
-  await authService.verifyEmail(req.body);
-  return sendSuccess(res, 200, "Email verified successfully", null);
+  const result = await authService.verifyEmail(req.body);
+  return sendSuccess(res, 200, "Email verified successfully", result);
 });
 
 // Login controller function

@@ -1,6 +1,7 @@
 import { EntitySchema } from "typeorm";
 import { BookingStatus, CompletionStatus, ConfirmationStatus } from "../../types/bookingstatus.js";
 import { WasteType } from "../../types/wastetype.js";
+import { BagSize } from "../../types/bagsize.js";
 
 export const Booking = new EntitySchema({
   name: "Booking",
@@ -23,18 +24,9 @@ export const Booking = new EntitySchema({
       type: "text",
     },  
 
-    time_window_start: {
+    time_of_booking: {
       type: "timestamptz",
-    },
-
-    time_window_end: {
-      type: "timestamptz",
-    },
-
-    status: {
-      type: "enum",
-      enum: Object.values(BookingStatus),
-      default: BookingStatus.BOOKED,
+      createDate: true,
     },
 
     quantity: {
@@ -43,11 +35,16 @@ export const Booking = new EntitySchema({
       scale: 2,
     },
 
-    actual_weight_or_bags: {
-      type: "numeric",
-      precision: 10,
-      scale: 2,
-      nullable: true,
+    bagSize: {
+      type: "enum",
+      enum: Object.values(BagSize),
+      nullable: false,
+    },
+
+    status: {
+      type: "enum",
+      enum: Object.values(BookingStatus),
+      default: BookingStatus.BOOKED,
     },
 
     completion_status: {

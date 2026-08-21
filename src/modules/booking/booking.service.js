@@ -1,42 +1,48 @@
 import { AppDataSource } from "../../config/db.js";
-import { BookingStatus, CompletionStatus} from "../../types/bookingstatus.js";
+import { BookingStatus, CompletionStatus } from "../../types/bookingstatus.js";
 import { AppError } from "../../utils/AppError.js";
-
+import logger from "../../utils/logger.js";
 
 const bookingRepository = AppDataSource.getRepository("Booking");
 const bookingStatusLogRepository = AppDataSource.getRepository("BookingStatusLog");
 
-
 export const createBooking = async (userId, payload) => {
-  return await dataSource.transaction(async (manager) => {
-    const booking = manager.getRepository(Booking).create({
+  return await AppDataSource.transaction(async (manager) => {
+    const bookingRepo = manager.getRepository("Booking");
+
+    const booking = bookingRepo.create({
       requester: { id: userId },
       waste_type: payload.waste_type,
       pickup_address: payload.pickup_address,
       quantity: payload.quantity,
-      time_window_start: payload.time_window_start,
-      time_window_end: payload.time_window_end,
+      bagSize: payload.bagSize, // requester's estimate at booking time
+      status: BookingStatus.BOOKED,
     });
 
-    const savedBooking = await manager.getRepository(Booking).save(booking);
+    const savedBooking = await bookingRepo.save(booking);
 
-    await manager.getRepository(BookingStatusLog).save({
+    await manager.getRepository("BookingStatusLog").save({
       booking: savedBooking,
       status: BookingStatus.BOOKED,
     });
+
+    logger.info("Booking created", { bookingId: savedBooking.booking_id, userId });
 
     return savedBooking;
   });
 };
 
-//
 export const claimBooking = async (bookingId, pickerId) => {
-  return await dataSource.transaction(async (manager) => {
-    const bookingRepo = manager.getRepository(Booking);
+  return await AppDataSource.transaction(async (manager) => {
+    const bookingRepo = manager.getRepository("Booking");
 
+    // NOTE: using the relation object form here (picker: { id }). If this
+    // hasn't been verified against the DB directly (confirm picker_id is
+    // actually set after a claim), consider switching to the raw FK column
+    // (picker_id: pickerId) which is safer under QueryBuilder.update().
     const updateResult = await bookingRepo
       .createQueryBuilder()
-      .update(Booking)
+      .update("Booking")
       .set({ status: BookingStatus.CLAIMED, picker: { id: pickerId } })
       .where("booking_id = :bookingId", { bookingId })
       .andWhere("status = :status", { status: BookingStatus.BOOKED })
@@ -44,57 +50,93 @@ export const claimBooking = async (bookingId, pickerId) => {
 
     if (updateResult.affected === 0) {
       const exists = await bookingRepo.findOne({ where: { booking_id: bookingId } });
-      if (!exists) throw new AppError("Booking not found", 404, "BOOKING_NOT_FOUND");
+
+      if (!exists) {
+        logger.warn("Claim attempted on nonexistent booking", { bookingId, pickerId });
+        throw new AppError("Booking not found", 404, "BOOKING_NOT_FOUND");
+      }
+
+      logger.warn("Claim attempted on unavailable booking", {
+        bookingId,
+        pickerId,
+        currentStatus: exists.status,
+      });
       throw new AppError("Booking is no longer available", 409, "BOOKING_NOT_AVAILABLE");
     }
 
-    const savedBooking = await bookingRepo.findOne({ where: { booking_id: bookingId } });
+    const savedBooking = await bookingRepo.findOne({
+      where: { booking_id: bookingId },
+      relations: ["picker"],
+    });
 
-    await manager.getRepository(BookingStatusLog).save({
+    await manager.getRepository("BookingStatusLog").save({
       booking: savedBooking,
       status: BookingStatus.CLAIMED,
     });
+
+    logger.info("Booking claimed", { bookingId, pickerId });
 
     return savedBooking;
   });
 };
 
-
 export const completeBooking = async (bookingId, pickerId, payload) => {
-  return await dataSource.transaction(async (manager) => {
-    const bookingRepo = manager.getRepository(Booking);
+  return await AppDataSource.transaction(async (manager) => {
+    const bookingRepo = manager.getRepository("Booking");
+
+    if (!Object.values(CompletionStatus).includes(payload.completion_status)) {
+      throw new AppError("Invalid completion status", 400, "INVALID_COMPLETION_STATUS");
+    }
 
     const booking = await bookingRepo.findOne({
       where: { booking_id: bookingId },
-      relations: ['picker'],
+      relations: ["picker"],
     });
 
     if (!booking) {
+      logger.warn("Complete attempted on nonexistent booking", { bookingId, pickerId });
       throw new AppError("Booking not found", 404, "BOOKING_NOT_FOUND");
     }
 
     if (booking.picker?.id !== pickerId) {
+      logger.warn("Complete attempted by unassigned picker", {
+        bookingId,
+        pickerId,
+        assignedPickerId: booking.picker?.id,
+      });
       throw new AppError("You are not assigned to this booking", 403, "NOT_ASSIGNED_TO_BOOKING");
     }
 
     if (booking.status !== BookingStatus.CLAIMED) {
+      logger.warn("Complete attempted on booking not in CLAIMED state", {
+        bookingId,
+        pickerId,
+        currentStatus: booking.status,
+      });
       throw new AppError("Booking cannot be completed", 409, "BOOKING_NOT_CLAIMED");
     }
 
-    booking.actual_weight_or_bags = payload.actual_weight_or_bags;
+    // overwrites the requester's original estimate with the picker's
+    // on-site value -- confirm this is the intended behavior (see note above)
+    booking.bagSize = payload.bagSize;
     booking.completion_status = payload.completion_status;
     booking.completed_at = new Date();
-
     booking.status =
       payload.completion_status === CompletionStatus.COMPLETED
         ? BookingStatus.COMPLETED
-        : BookingStatus.FAILED; // or whatever your enum defines for non-success paths
+        : BookingStatus.FAILED;
 
     const savedBooking = await bookingRepo.save(booking);
 
-    await manager.getRepository(BookingStatusLog).save({
+    await manager.getRepository("BookingStatusLog").save({
       booking: savedBooking,
-      status: savedBooking.status, // matches reality now
+      status: savedBooking.status,
+    });
+
+    logger.info("Booking completed", {
+      bookingId,
+      pickerId,
+      finalStatus: savedBooking.status,
     });
 
     return savedBooking;
