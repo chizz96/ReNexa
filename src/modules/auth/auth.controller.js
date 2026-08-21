@@ -5,8 +5,8 @@ import * as googleProvider from "../Googleoauthservices/google.provider.js";
 
 // Register controller function
 export const register = asyncHandler(async (req, res) => {
-  const user = await authService.register (req.body);
-  return sendSuccess(res, 201, "User created successfully", { user });
+   await authService.register (req.body);
+  return sendSuccess(res, 201, "User created successfully", null);
 });
 
 // Email verification controller function
