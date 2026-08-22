@@ -3,6 +3,8 @@ export const BookingStatus = Object.freeze({
   PICKED_UP: "picked_up",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
+  CLAIMED: "claimed",
+  Failed: "failed",
 });
 
 export const CompletionStatus = Object.freeze({

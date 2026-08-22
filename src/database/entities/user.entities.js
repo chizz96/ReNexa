@@ -168,5 +168,6 @@ export const User = new EntitySchema({
       target: "Booking",
       inverseSide: "picker",
     },
+
   },
 });
