@@ -11,7 +11,7 @@ const router = Router();
 router.use(authverification);
 
 router.post( "/bookings", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER), validate(createBookingSchema), bookingController.createBooking);
-router.patch("/:bookingId/claim", authorize(UserRole.WASTE_COLLECTOR), bookingController.claimBooking);
-router.patch( "/:bookingId/complete", authorize(UserRole.WASTE_COLLECTOR), validate(completeBookingSchema), bookingController.completeBooking);
+router.patch("/:bookingId/claim", authorize(UserRole.WASTE_COLLECTOR, UserRole.ADMIN), bookingController.claimBooking);
+router.patch( "/:bookingId/complete", authorize(UserRole.WASTE_COLLECTOR, UserRole.ADMIN), validate(completeBookingSchema), bookingController.completeBooking);
 
 export default router;

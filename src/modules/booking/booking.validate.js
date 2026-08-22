@@ -1,33 +1,40 @@
 import Joi from "joi";
+import  WasteType from "../../types/wastetype.js";
+import BagSize from "../../types/bagsize.js";
 
 export const createBookingSchema = Joi.object({
   waste_type: Joi.string()
-    .trim()
-    .max(50)
-    .optional(),
+    .valid(...Object.values(WasteType))
+    .optional() 
+    .messages({
+      "any.only": `Waste type must be one of: ${Object.values(WasteType).join(", ")}`,
+    }),
 
-  lga: Joi.string()
-    .trim()
-    .max(50)
-    .required(),
+  pickup_address: Joi.string().trim().min(5).max(255).required(),
 
-  area: Joi.string()
-    .trim()
-    .max(100)
-    .required(),
-
-  address_text: Joi.string()
-    .trim()
-    .required(),
-
-  time_window_start: Joi.date()
-    .required(),
-
-  time_window_end: Joi.date()
-    .greater(Joi.ref("time_window_start"))
+  quantity: Joi.number()
+    .positive()
+    .precision(2)
     .required()
     .messages({
-      "date.greater":
-        "End time must be after start time",
+      "number.base": "Quantity must be a number",
+      "number.positive": "Quantity must be greater than 0",
+    }),
+
+  pickup_date: Joi.date().iso().greater("now").required(),
+
+  pickup_time: Joi.string()
+    .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/) // DB type is `time`, allow optional seconds
+    .required()
+    .messages({
+      "string.pattern.base": "Pickup time must be in HH:mm or HH:mm:ss format",
+    }),
+
+  bagSize: Joi.string()
+    .valid(...Object.values(BagSize))
+    .required()
+    .messages({
+      "any.only": `Bag size must be one of: ${Object.values(BagSize).join(", ")}`,
     }),
 });
+

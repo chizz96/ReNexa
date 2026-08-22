@@ -15,7 +15,9 @@ export const createBooking = async (userId, payload) => {
       waste_type: payload.waste_type,
       pickup_address: payload.pickup_address,
       quantity: payload.quantity,
-      bagSize: payload.bagSize, // requester's estimate at booking time
+      pickup_date: payload.pickup_date,
+      pickup_time: payload.pickup_time,
+      bagSize: payload.bagSize, 
       status: BookingStatus.BOOKED,
     });
 
@@ -36,10 +38,7 @@ export const claimBooking = async (bookingId, pickerId) => {
   return await AppDataSource.transaction(async (manager) => {
     const bookingRepo = manager.getRepository("Booking");
 
-    // NOTE: using the relation object form here (picker: { id }). If this
-    // hasn't been verified against the DB directly (confirm picker_id is
-    // actually set after a claim), consider switching to the raw FK column
-    // (picker_id: pickerId) which is safer under QueryBuilder.update().
+
     const updateResult = await bookingRepo
       .createQueryBuilder()
       .update("Booking")
@@ -116,9 +115,10 @@ export const completeBooking = async (bookingId, pickerId, payload) => {
       throw new AppError("Booking cannot be completed", 409, "BOOKING_NOT_CLAIMED");
     }
 
-    // overwrites the requester's original estimate with the picker's
-    // on-site value -- confirm this is the intended behavior (see note above)
-    booking.bagSize = payload.bagSize;
+    if (payload.bagSize !== undefined) {
+      booking.bagSize = payload.bagSize;
+    }
+    
     booking.completion_status = payload.completion_status;
     booking.completed_at = new Date();
     booking.status =

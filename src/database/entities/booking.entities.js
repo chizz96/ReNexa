@@ -41,6 +41,16 @@ export const Booking = new EntitySchema({
       nullable: false,
     },
 
+    pickup_date: {
+      type: "date",
+      nullable: false,
+    },
+    
+    pickup_time: {
+      type: "time",
+      nullable: false,
+    },
+
     status: {
       type: "enum",
       enum: Object.values(BookingStatus),
