@@ -1,6 +1,6 @@
 import Joi from "joi";
-import  WasteType from "../../types/wastetype.js";
-import BagSize from "../../types/bagsize.js";
+import { WasteType } from "../../types/wastetype.js";
+import { BagSize } from "../../types/bagsize.js";
 
 export const createBookingSchema = Joi.object({
   waste_type: Joi.string()
