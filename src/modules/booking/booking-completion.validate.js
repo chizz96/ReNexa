@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { CompletionStatus } from "../../types/bookingstatus.js";
+import { BagSize } from "../../types/bagsize.js";
 
 export const completeBookingSchema = Joi.object({
   bagSize: Joi.string()
