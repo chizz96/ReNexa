@@ -3,6 +3,8 @@ import { Router } from "express";
 import * as authController from "../auth/auth.controller.js";
 import { validate } from "../../middleware/validate.middleware.js";
 import { registerSchema, verifyEmailSchema, loginSchema, resendOtpSchema, forgotPasswordSchema, resetPasswordSchema, refreshTokenSchema } from "../auth/auth.validate.js";
+import { authverification } from "../../middleware/auth.middleware.js";
+
 
 const router = Router();
 
@@ -22,7 +24,7 @@ router.post("/reset-password/:token",validate(resetPasswordSchema),authControlle
 
 router.post("/refresh-token",validate(refreshTokenSchema), authController.refreshAccessToken);
 
-router.post("/logout", authController.logout);
+router.post("/logout", authverification, authController.logout);
 
 router.get("/google", authController.googleLogin);
 
