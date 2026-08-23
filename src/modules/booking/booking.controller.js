@@ -28,7 +28,7 @@ export const assignPickerToBooking = asyncHandler(async (req, res) => {
 export const completeBooking = asyncHandler(async (req, res) => {
   const booking = await bookingService.completeBooking(
     req.params.bookingId,
-    req.user.sub,
+    req.body.pickerId,
     req.body
   );
 

@@ -1,6 +1,7 @@
 import { AppDataSource } from "../../config/db.js";
 import { BookingStatus, CompletionStatus } from "../../types/bookingstatus.js";
 import { AppError } from "../../utils/AppError.js";
+import { UserRole } from "../../types/user.js";
 import logger from "../../utils/logger.js";
 
 const bookingRepository = AppDataSource.getRepository("Booking");
@@ -160,6 +161,23 @@ export const getMyBookings = async (userId) => {
   return bookings;
 };
 
+export const getAllBookings = async () => {
+  const bookings = await bookingRepository.find({
+    relations: { requester: true, picker: true, statusLogs: true }, 
+
+    order: { created_at: "DESC" },
+  });
+  return bookings;
+}
+
+export const getBookings = async (userId, role) => {
+  if (role === UserRole.ADMIN) {
+    return await getAllBookings();
+  }
+
+  return await getMyBookings(userId);
+};
+
 export const getBookingById = async (bookingId) => {
   const booking = await bookingRepository.findOne({
     where: { booking_id: bookingId },
@@ -172,15 +190,6 @@ export const getBookingsByPickerId = async (pickerId) => {
   const bookings = await bookingRepository.find({
     where: { picker: { id: pickerId } },
     relations: { requester: true, statusLogs: true },
-    order: { created_at: "DESC" },
-  });
-  return bookings;
-}
-
-export const getAllBookings = async () => {
-  const bookings = await bookingRepository.find({
-    relations: { requester: true, picker: true, statusLogs: true }, 
-
     order: { created_at: "DESC" },
   });
   return bookings;
