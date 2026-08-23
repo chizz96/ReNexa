@@ -9,7 +9,7 @@ import { AuthProvider } from "../../types/authprovider.js";
 import { sendTemplateEmail } from "../../utils/email.utils.js";
 import { generateResetToken } from "../../utils/resetPassword.js";
 import { exchangeCodeForGoogleProfile} from "../Googleoauthservices/google.provider.js";
-import  logger  from "../../utils/logger.js";
+//import  logger  from "../../utils/logger.js";
 
 
 const userRepo = AppDataSource.getRepository("User")
@@ -360,7 +360,7 @@ export const authenticateGoogleProfile = async (profile) => {
           password: null,
 
           // Give Google users a default role
-          role: "household",
+          role: UserRole.HOUSEHOLD,
         })
       );
     }
