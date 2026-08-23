@@ -9,7 +9,7 @@ export const createPicker = asyncHandler(async (req, res) => {
 });
 
 export const listPickers = asyncHandler(async (req, res) => {
-  const pickers = await pickerService.listPickers(req.query);
+  const pickers = await pickerService.listPickers(req.validatedQuery);
 
   return sendSuccess(res, 200, "Pickers retrieved successfully", pickers);
 });
