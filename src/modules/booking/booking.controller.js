@@ -40,6 +40,11 @@ export const getBookings = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, "Bookings retrieved successfully", bookings);
 }); 
 
+export const getMyBookings = asyncHandler(async (req, res) => {
+  const bookings = await bookingService.getMyBookings(req.user.sub);
+  return sendSuccess(res, 200, "My bookings retrieved successfully", bookings);
+});
+
 export const getBookingById = asyncHandler(async (req, res) => {
   const booking = await bookingService.getBookingById(req.params.bookingId);
   return sendSuccess(res, 200, "Booking retrieved successfully", booking);

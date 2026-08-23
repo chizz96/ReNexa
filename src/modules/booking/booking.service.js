@@ -151,7 +151,7 @@ export const completeBooking = async (bookingId, pickerId, payload) => {
 };
 
 
-export const getmyBookings = async (userId) => {
+export const getMyBookings = async (userId) => {
   const bookings = await bookingRepository.find({
     where: { requester: { id: userId } },
     relations: ["picker", "statusLogs"],

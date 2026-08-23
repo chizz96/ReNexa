@@ -17,5 +17,6 @@ router.get( "/bookings", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER, 
 router.get( "/bookings/:bookingId", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER, UserRole.ADMIN), bookingController.getBookingById);  
 router.get( "/bookings/picker/:pickerId", authorize(UserRole.ADMIN), bookingController.getBookingsByPickerId);
 router.get( "/bookings/all", authorize(UserRole.ADMIN), bookingController.getAllBookings);
+router.get( "/bookings/mine", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER), bookingController.getMyBookings);
 
 export default router;
