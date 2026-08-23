@@ -38,6 +38,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, "Password reset successfully", result);
 });
 
+// Refresh access token controller function
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   const result = await authService.refreshAccessToken(req.body);
 
@@ -49,6 +50,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   );
 });
 
+// Logout controller function
 export const logout = asyncHandler(async (req, res) => {
   await authService.logout({
     userId: req.user.sub,
@@ -69,17 +71,29 @@ export const googleLogin = asyncHandler(async (req, res) => {
   return res.redirect(url);
 });
 
-export const googleCallback = asyncHandler(async (req, res) => {
-  const { code } = req.query;
 
-  if (!code) 
-  {
-    throw new AppError("Google authorization code is missing", 400, "GOOGLE_CODE_MISSING");
+export const googleCallback = asyncHandler(async (req, res) => {
+  const { code, state } = req.query;
+  const redirectBase = googleProvider.getGoogleSuccessRedirect();
+
+  if (!code) {
+    return res.redirect(`${redirectBase}/oauth/callback#error=missing_code`);
   }
 
-  const result = await authService.handleGoogleOAuthCallback(code);
+  try {
+    googleProvider.verifyState(state);
 
-  return sendSuccess(res, 200, "Google authentication successful", result);
+    const result = await authService.handleGoogleOAuthCallback(code);
+    const { accessToken, refreshToken, user } = result;
+
+    const redirectUrl =
+      `${redirectBase}/oauth/callback#accessToken=${encodeURIComponent(accessToken)}` +
+      `&refreshToken=${encodeURIComponent(refreshToken)}` +
+      `&user=${encodeURIComponent(JSON.stringify(user))}`;
+
+    return res.redirect(redirectUrl);
+  } catch (error) {
+    const message = error?.message || "google_auth_failed";
+    return res.redirect(`${redirectBase}/oauth/callback#error=${encodeURIComponent(message)}`);
+  }
 });
-
-

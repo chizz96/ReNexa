@@ -163,11 +163,7 @@ export const User = new EntitySchema({
       inverseSide: "requester",
     },
 
-    bookingsAsPicker: {
-      type: "one-to-many",
-      target: "Booking",
-      inverseSide: "picker",
-    },
+    
 
   },
 });

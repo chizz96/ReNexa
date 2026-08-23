@@ -103,7 +103,7 @@ export const Booking = new EntitySchema({
 
     picker: {
       type: "many-to-one",
-      target: "User",
+      target: "Picker",
       joinColumn: {
         name: "picker_id",
         referencedColumnName: "id",

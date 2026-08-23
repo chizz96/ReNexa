@@ -4,7 +4,7 @@ export const BookingStatus = Object.freeze({
   COMPLETED: "completed",
   CANCELLED: "cancelled",
   CLAIMED: "claimed",
-  Failed: "failed",
+  FAILED: "failed",
 });
 
 export const CompletionStatus = Object.freeze({

@@ -38,3 +38,12 @@ export const createBookingSchema = Joi.object({
     }),
 });
 
+
+export const assignPickerSchema = Joi.object({
+  pickerId: Joi.string()
+    .guid({ version: "uuidv4" })
+    .required()
+    .messages({
+      "string.guid": "Picker ID must be a valid UUID",
+    })
+});

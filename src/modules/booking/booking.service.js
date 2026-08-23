@@ -34,9 +34,16 @@ export const createBooking = async (userId, payload) => {
   });
 };
 
-export const claimBooking = async (bookingId, pickerId) => {
+export const assignPickerToBooking = async (bookingId, pickerId) => {
   return await AppDataSource.transaction(async (manager) => {
     const bookingRepo = manager.getRepository("Booking");
+    const pickerRepo = manager.getRepository("Picker");
+
+    const picker = await pickerRepo.findOne({ where: { id: pickerId } });
+    if (!picker) {
+      logger.warn("Assign attempted with nonexistent picker", { bookingId, pickerId });
+      throw new AppError("Picker not found", 404, "PICKER_NOT_FOUND");
+    }
 
 
     const updateResult = await bookingRepo
@@ -142,3 +149,39 @@ export const completeBooking = async (bookingId, pickerId, payload) => {
     return savedBooking;
   });
 };
+
+
+export const getmyBookings = async (userId) => {
+  const bookings = await bookingRepository.find({
+    where: { requester: { id: userId } },
+    relations: ["picker", "statusLogs"],
+    order: { created_at: "DESC" },
+  });
+  return bookings;
+};
+
+export const getBookingById = async (bookingId) => {
+  const booking = await bookingRepository.findOne({
+    where: { booking_id: bookingId },
+    relations: ["picker", "statusLogs"],
+  });
+  return booking;
+};
+
+export const getBookingsByPickerId = async (pickerId) => {
+  const bookings = await bookingRepository.find({
+    where: { picker: { id: pickerId } },
+    relations: ["requester", "statusLogs"],
+    order: { created_at: "DESC" },
+  });
+  return bookings;
+}
+
+export const getAllBookings = async () => {
+  const bookings = await bookingRepository.find({
+    relations: ["requester", "picker", "statusLogs"], 
+
+    order: { created_at: "DESC" },
+  });
+  return bookings;
+}

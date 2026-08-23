@@ -250,7 +250,7 @@ export const forgotPassword = async ({ email }) => {
 
   await userRepo.save(user);
 
-  const resetUrl = `https://renexa.onrender.com/api/auth/reset-password/${resetToken}`;
+  const resetUrl = `https://renexa.vercel.app/api/auth/reset-password/${resetToken}`;
 
   sendTemplateEmail(user.email, "Reset Password", "forgetPassword",{
     firstName:user.firstName,

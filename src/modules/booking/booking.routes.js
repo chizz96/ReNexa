@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authverification, authorize } from "../../middleware/auth.middleware.js";
 import { validate } from "../../middleware/validate.middleware.js";
-import { createBookingSchema } from "./booking.validate.js";
+import { createBookingSchema,assignPickerSchema } from "./booking.validate.js";
 import * as bookingController from "./booking.controller.js";
 import { UserRole } from "../../types/user.js";
 import { completeBookingSchema } from "./booking-completion.validate.js";
@@ -11,7 +11,11 @@ const router = Router();
 router.use(authverification);
 
 router.post( "/bookings", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER), validate(createBookingSchema), bookingController.createBooking);
-router.patch("/:bookingId/claim", authorize(UserRole.WASTE_COLLECTOR, UserRole.ADMIN), bookingController.claimBooking);
-router.patch( "/:bookingId/complete", authorize(UserRole.WASTE_COLLECTOR, UserRole.ADMIN), validate(completeBookingSchema), bookingController.completeBooking);
+router.patch("/:bookingId/assign", authorize(UserRole.ADMIN), validate(assignPickerSchema), bookingController.assignPickerToBooking);
+router.patch( "/:bookingId/complete", authorize(UserRole.ADMIN), validate(completeBookingSchema), bookingController.completeBooking);
+router.get( "/bookings", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER, UserRole.ADMIN), bookingController.getBookings);
+router.get( "/bookings/:bookingId", authorize(UserRole.HOUSEHOLD, UserRole.BUSINESS_OWNER, UserRole.ADMIN), bookingController.getBookingById);  
+router.get( "/bookings/picker/:pickerId", authorize(UserRole.ADMIN), bookingController.getBookingsByPickerId);
+router.get( "/bookings/all", authorize(UserRole.ADMIN), bookingController.getAllBookings);
 
 export default router;
