@@ -72,7 +72,7 @@ export const assignPickerToBooking = async (bookingId, pickerId) => {
 
     const savedBooking = await bookingRepo.findOne({
       where: { booking_id: bookingId },
-      relations: ["picker"],
+      relations: { picker: true },
     });
 
     await manager.getRepository("BookingStatusLog").save({
@@ -96,7 +96,7 @@ export const completeBooking = async (bookingId, pickerId, payload) => {
 
     const booking = await bookingRepo.findOne({
       where: { booking_id: bookingId },
-      relations: ["picker"],
+      relations: { picker: true },
     });
 
     if (!booking) {
@@ -154,7 +154,7 @@ export const completeBooking = async (bookingId, pickerId, payload) => {
 export const getMyBookings = async (userId) => {
   const bookings = await bookingRepository.find({
     where: { requester: { id: userId } },
-    relations: ["picker", "statusLogs"],
+    relations: { picker: true, statusLogs: true },
     order: { created_at: "DESC" },
   });
   return bookings;
@@ -163,7 +163,7 @@ export const getMyBookings = async (userId) => {
 export const getBookingById = async (bookingId) => {
   const booking = await bookingRepository.findOne({
     where: { booking_id: bookingId },
-    relations: ["picker", "statusLogs"],
+    relations: { picker: true, statusLogs: true },
   });
   return booking;
 };
@@ -171,7 +171,7 @@ export const getBookingById = async (bookingId) => {
 export const getBookingsByPickerId = async (pickerId) => {
   const bookings = await bookingRepository.find({
     where: { picker: { id: pickerId } },
-    relations: ["requester", "statusLogs"],
+    relations: { requester: true, statusLogs: true },
     order: { created_at: "DESC" },
   });
   return bookings;
@@ -179,7 +179,7 @@ export const getBookingsByPickerId = async (pickerId) => {
 
 export const getAllBookings = async () => {
   const bookings = await bookingRepository.find({
-    relations: ["requester", "picker", "statusLogs"], 
+    relations: { requester: true, picker: true, statusLogs: true }, 
 
     order: { created_at: "DESC" },
   });
