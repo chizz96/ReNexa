@@ -9,6 +9,7 @@ import { AuthProvider } from "../../types/authprovider.js";
 import { sendTemplateEmail } from "../../utils/email.utils.js";
 import { generateResetToken } from "../../utils/resetPassword.js";
 import { exchangeCodeForGoogleProfile} from "../Googleoauthservices/google.provider.js";
+import { UserRole } from "../../types/user.js";
 //import  logger  from "../../utils/logger.js";
 
 
@@ -360,7 +361,7 @@ export const authenticateGoogleProfile = async (profile) => {
           password: null,
 
           // Give Google users a default role
-          role: UserRole.HOUSEHOLD,
+          role: null, // or UserRole.USER if you want to assign a default role
         })
       );
     }
